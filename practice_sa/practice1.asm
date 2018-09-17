@@ -29,12 +29,19 @@ resultado: dd 0
 ;Double F. 128 bits
 numero128_1: dq 2.5
 numero128_2: dq 3.0
+;Imprimir register
+print_register db "Register = %08X", 10, 0
 
 section .text
 
-global CMAIN
-CMAIN:
-    mov ebp, esp
+global _start
+_syscall:
+    int     0x80                                ;system call
+	  ret
+
+_start:
+    push EBP
+    mov EBP, ESP
     ;PRINT_STRING [T]
     ;PRIND_UDEC sin signo PRINT_HEX hexa newline
 
@@ -42,12 +49,12 @@ CMAIN:
     mov AH,[N1]
     ADD AH,[N2]
     ;PRINT_DEC 1,AH
-	  ;push dword esi
-    push dword [AX]
-    call _printf
-    ADD ESP,4
-    ;POP ESI
 
+    mov bx, 8
+    push bx
+    push print_register
+    call _printf
+    add ESP, 8
 
     ;resta de dos numeros de 16 bits (N3 - N4 )
     mov BX,[N3]
@@ -96,10 +103,10 @@ CMAIN:
     ;PRINT_DEC 4,resultado
 
     ;Cómo podría resolver la suma de números de 128 bits, usando registros de 32 bits
-    ;PUSH qword numero128_1
-    ;PUSH qword numero128_2
 
-    POP  [ESP+4]
-    POP  [ESP+4]
-    xor eax, eax
+    mov  ESP, EBP
+    pop EBP
     ret
+    ;push    dword 0                             ;exit code
+   ;mov     eax,0x1                             ;system call number (sys_exit)
+   ;call    _syscall                            ;call kernel
