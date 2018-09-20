@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-extern void start();
+extern void printNumber();
 int main(void) {
-  start(); 
+  printNumber();
+  printf("asd");
 }
