@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-extern void start();
+extern void practice1();
 int main(void) {
-  start(); 
+  practice1();
 }

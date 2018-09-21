@@ -1,114 +1,178 @@
+global _practice1
+
 section .data
 
+; Formatos de print
+fmt_number_suma_N1_N2: db "N1 + N2 = %d", 10, 0
+fmt_number_resta_N3_N4: db "N3 - N4 = %d", 10, 0
+fmt_number_mul_N1_N2: db "N3 * N4 = %d", 10, 0
+fmt_number_div_N3_N4: db "N3 / N4 = %04X (Primeros dos valores resto y los otros dos cociente)", 10, 0
+fmt_number_sum_N5_N6: db "N5 + N6 = %d", 10, 0
+fmt_number_sum_N64_1_and_N64_2: db "%032X",10,0
+fmt_string:    db "%s", 10,0
+
+; Cadena de caracteres
 T: db "Hola Mundo",13,10,0
-fmt:    db "%s", 0
+
 ; Enteros sin signo de 8 bits
 N1: db 1
 N2: db 2
+
 ; Enteros de 16 bits
-N3: dw 10
+N3: dw 11
 N4: dw 5
-; Enteros de 32 bits
-N_5: dd 35
-N_6: dd 5
+
 ; Enteros de 32 bits
 N5: dd 35
 N6: dd 5
+
 ; Enteros sin signo de 64 bits
 N7: dq 7
 N8: dq 8
-;Punto flotante de precisión simple
+
+; Punto flotante de precisión simple
 F1: dd 1.0
-;Punto flotante de precisión doble
+
+; Punto flotante de precisión doble
 F2: dq 2.0
+
 ; Enteros de 64 bits
-N64_1: dd 0x1005,0x63120000;cada dos 8 bits = total 32bits
-N64_2: dd 0x0100,0xF1210000
-;Resultado de division 32 bits
-resultado: dd 0
-;Double F. 128 bits
-numero128_1: dq 2.5
-numero128_2: dq 3.0
-;Imprimir register
-print_register db "Register = %08X", 10, 0
+N64_1: dd 0x00001001,0x0000F312 ;OBS! cada dos equiv. 8 bits = total 32bits
+N64_2: dd 0x0000010F,0x0000F121
+
 
 section .text
+
 extern _printf
-global _main
 
-
-_main:
+_practice1:
+    ; Imprimo cadena de caracteres asciiz
     push ebp
     mov ebp, esp
 
     push T
-    push dword fmt
+    push dword fmt_string
     call _printf
-
     add esp, 8
+
+    mov esp,ebp
+    pop ebp
+
+    ; Suma de dos numeros de 8 bits (N1 + N2)
+    push ebp
+    mov ebp, esp
+
+    mov eax, 0
+    mov AL,[N1]
+    add AL,[N2]
+    push EAX
+    push dword fmt_number_suma_N1_N2
+    call _printf
+    add esp, 8
+
     mov esp,ebp
     pop ebp
 
 
-    ;suma de dos numeros de 8 bits (N1 + N2)
-    ;mov AH,[N1]
-    ;ADD AH,[N2]
-    ;PRINT_DEC 1,AH
+    ; Resta de dos numeros de 16 bits (N3 - N4 )
+    push ebp
+    mov ebp, esp
 
-  ;  mov bx, 8
-  ;  push bx
-  ;  push print_register
-  ;  call _printf
-  ;  add ESP, 8
+    mov ebx,0
+    mov BX,[N3]
+    sub BX,[N4]
 
-    ;resta de dos numeros de 16 bits (N3 - N4 )
-    ;mov BX,[N3]
-    ;SUB BX,[N4]
-    ;PRINT_DEC 2,BX
+    push ebx
+    push dword fmt_number_resta_N3_N4
+    call _printf
+    add esp, 8
 
-    ;multiplicacion de numeros de 8 bits (N1 * N2 )
-  ; mov AL,[N1]
-  ;  mov BL,[N2]
-  ;  MUL BL
-    ;PRINT_DEC 2,BL
+    mov ebp, esp
+    pop ebp
 
-     ;Cociente (AL) y resto (AH) de la división entera 16 bits (N3/N4 )
-    ;TO DO
+    ; Multiplicacion de numeros de 8 bits (N1 * N2 )
+    push ebp
+    mov ebp, esp
 
-  ;  mov AX,[N3]
-  ;  mov BL,[N4]
-  ;  DIV BL
-    ;PRINT_DEC 2,AH
-    ;PRINT_DEC 2,AL
+    mov eax,0
+    mov ebx,0
+
+    mov AL,[N1]
+    mov BL,[N2]
+    mul BL
+
+    push ebx
+    push dword fmt_number_mul_N1_N2
+    call _printf
+    add esp, 8
+
+    mov ebp, esp
+    pop ebp
+
+    ; Cociente (AL) y resto (AH) de la división entera 16 bits (N3 / N4)
+    push ebp
+    mov ebp, esp
+
+    mov eax,0
+    mov ebx,0
+
+    mov AX,[N3]
+    mov BL,[N4]
+    div BL
+
+    push eax
+    push dword fmt_number_div_N3_N4
+    call _printf
+    add esp, 8
+
+    mov ebp, esp
+    pop ebp
+
+    ; Suma de dos números de 32 bits. (N5 + N6)
+    push ebp
+    mov ebp, esp
+
+    mov eax,0
+
+    mov eax,[N5]
+    add eax,[N6]
+
+    push eax
+    push dword fmt_number_sum_N5_N6
+    call _printf
+    add esp, 8
+
+    mov ebp, esp
+    pop ebp
+
+    ; Suma de dos números de 64 bits usando reg. de 32 (N64_1 + N64_2 )
+
+    push ebp
+    mov ebp, esp
+
+    mov eax,0
+    mov ebx,0
+
+    mov ebx,[N64_1]
+    adc ebx,[N64_2]
+
+    push ebx
+    push dword fmt_number_sum_N64_1_and_N64_2
+    call _printf
+    add esp, 8
+
+    mov eax,[N64_1+4]
+    adc eax,[N64_2+4]
+    push eax
+
+    push dword fmt_number_sum_N64_1_and_N64_2
+    call _printf
+    add esp, 8
+
+    mov ebp, esp
+    pop ebp
 
 
-    ;Suma de dos números de 32 bits. (N5 + N6)
-  ;  mov EAX,[N5]
-  ;  ADD EAX,[N6]
-    ;PRINT_DEC 4,EAX
 
-    ;Suma de dos números de 64 bits usando reg de 32. (N64_1 + N64_2)
-  ;  mov EAX,[N64_1+4]
-  ;  ADD EAX,[N64_2+4]
-  ;  mov EBX,[N64_1]
-  ;  ADC EBX,[N64_2]
-    ;PRINT_HEX 4,EBX
-    ;PRINT_HEX 4,EAX
 
-    ;Cociente y resto de la división N5/N6 usando registros de 32 bits
-  ;  MOV EDX, 0; limpio para que no retorne: (SIGFPE) https://stackoverflow.com/questions/8649180/assembly-divisions-and-floating-points
-  ;  MOV EAX,[N_5]
-  ;  MOV ECX,[N_6]
-  ;  DIV ECX
-
-    ;PRINT_DEC 4,AX
-    ;PRINT_DEC 4,DX
-
-  ;  mov [resultado],AX
-    ;PRINT_DEC 4,resultado
-
-    ;Cómo podría resolver la suma de números de 128 bits, usando registros de 32 bits
-
-  ;  mov  ESP, EBP
-  ;  pop EBP
     ret
