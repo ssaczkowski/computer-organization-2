@@ -1,18 +1,5 @@
 global _practice1
 
-; A macro with one parameters
-; Implements the write
-%macro my_macro 1
-  pop ebp
-  mov ebp,esp
-  push dword %1
-  call _printf
-  add esp, 4
-
-  mov ebp, esp
-  pop ebp
-%endmacro
-
 %macro print_msg 1
   pop ebp
   mov ebp, esp
@@ -22,6 +9,7 @@ global _practice1
   mov ebp, esp
   pop ebp
 %endmacro
+
 
 section .data
 
@@ -41,11 +29,10 @@ fmt_show_decimal: db "decimal: %d ",10,0
 fmt_show_dividend: db "Dividend: %04X ",10,0
 fmt_show_divider: db "Divider: %04X ",10,0
 fmt_string:    db "%s", 10,0
-msg_N1_mas_grande: db "N1 es mayor que N2", 10, 0
-msg_N2_mas_grande: db "N2 es mayor que N1", 10, 0
-
-
-msg_macro db	'I am a macro!',10,0
+msg_N1_is_greater: db "N1 es mayor que N2", 10, 0
+msg_N2_is_greater: db "N2 es mayor que N1", 10, 0
+msg_N3_sub_N4_is_zero: db "N3-N4 is zero",10,0
+msg_not_zero: db "N3-N4 not zero",10,0
 
 
 ; Cadena de caracteres
@@ -76,8 +63,6 @@ F2: dq 2.0
 ; Enteros de 64 bits
 N64_1: dd 0x00001001,0x0000F312 ;OBS! cada dos equiv. 8 bits = total 32bits
 N64_2: dd 0x0000010F,0x0000F121
-
-bignum dd 20
 
 
 section .text
@@ -242,34 +227,53 @@ _practice1:
     mov ebp, esp
     pop ebp
 
-    ;N1 es mayor que N2 ?
+    ;N1 is greater than N2 ?
     push ebp
     mov ebp, esp
 
     mov al,0
     mov al,[N1]
     cmp al, [N2]
-    ja N1_es_mas_grande
-    jb N2_es_mas_grande
+    ja N1_is_greater
+    jb N2_is_greater
+    mov ebp, esp
+    pop ebp
+    jmp continue_ex4b
 
-    N1_es_mas_grande:
-      print_msg msg_N1_mas_grande
-      jmp continue_ej_4b
+    N1_is_greater:
+      print_msg msg_N1_is_greater
+      mov ebp, esp
+      pop ebp
+      jmp continue_ex4b
 
-    N2_es_mas_grande:
-      print_msg msg_N2_mas_grande
 
-    continue_ej_4b:
-    ; Si el resultado de N3 - N4 es cero
+    N2_is_greater:
+      print_msg msg_N2_is_greater
+      mov ebp, esp
+      pop ebp
+
+    continue_ex4b:
+    ; If return N3 - N4 is zero
 
     push ebp
-    mov ebp,esp
+    mov ebp, esp
 
+    mov ebx,0
+    mov BX,[N3]
+    sub BX,[N4]
+    cmp ebx,0
+    jz iszero
+    print_msg msg_not_zero
+    mov ebp, esp
+    pop ebp
+    jmp continue_ex4c
+    iszero:
+      print_msg msg_N3_sub_N4_is_zero
+      mov ebp, esp
+      pop ebp
 
-
-
-
-
+    continue_ex4c:
+      
 
 
     ret
